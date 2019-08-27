@@ -62,6 +62,9 @@ class ScormXBlock(XBlock):
     has_score = True
     has_author_view = True
 
+    # Enable view as specific student
+    show_in_read_only_mode = True
+
     display_name = String(
         display_name=_("Display Name"),
         help=_("Display name for this module"),
@@ -153,7 +156,7 @@ class ScormXBlock(XBlock):
         student = self.runtime.get_real_user(anon_id) if self.runtime.get_real_user is not None else None
         if student:
             try:
-                # reverse should be default and is expected by SCORM API 
+                # reverse should be default and is expected by SCORM API
                 # but can be overridden via XBLOCK settings
                 reverse = SCORM_REVERSE_STUDENT_NAMES
                 split_name = student.profile.name.split(' ')
@@ -194,8 +197,8 @@ class ScormXBlock(XBlock):
             site = get_current_site()  # theming.helpers
         except TypeError:
             site = get_current_site(RequestCache.get_current_request())  # django.contrib.site
-        try:  
-            # guard against unset/default Site domain           
+        try:
+            # guard against unset/default Site domain
             lms_base = site.domain if str(site.domain) != DEFAULT_SITE_DOMAIN else settings.ENV_TOKENS.get("LMS_BASE")
         except AttributeError:
             lms_base = settings.ENV_TOKENS("LMS_BASE")
@@ -221,7 +224,7 @@ class ScormXBlock(XBlock):
         if not authoring:
             get_url = '{}://{}{}'.format(scheme, lms_base, self.runtime.handler_url(self, "get_raw_scorm_status"))
             set_url = '{}://{}{}'.format(scheme, lms_base, self.runtime.handler_url(self, "set_raw_scorm_status"))
-        # PreviewModuleSystem (runtime Mixin from Studio) won't have a hostname            
+        # PreviewModuleSystem (runtime Mixin from Studio) won't have a hostname
         else:
             # we don't want to get/set SCORM status from preview
             get_url = set_url = '#'
@@ -237,9 +240,9 @@ class ScormXBlock(XBlock):
 
         frag = Fragment()
         frag.add_content(MakoTemplate(text=html.format(self=self, scorm_player_url=scorm_player_url,
-                                                       get_url=get_url, set_url=set_url, 
+                                                       get_url=get_url, set_url=set_url,
                                                        iframe_width=iframe_width, iframe_height=iframe_height,
-                                                       player_config=player_config, 
+                                                       player_config=player_config,
                                                        scorm_file=self.scorm_file)
                                      ).render_unicode())
 
@@ -253,7 +256,7 @@ class ScormXBlock(XBlock):
         # categories of blocks that are specified in lms/templates/staff_problem_info.html so this will
         # for now have to be overridden in theme or directly in edx-platform
         # TODO: is there another way to approach this?  key's location.category isn't mutable to spoof 'problem',
-        # like setting the name in the entry point to 'problem'.  Doesn't seem like a good idea.  Better to 
+        # like setting the name in the entry point to 'problem'.  Doesn't seem like a good idea.  Better to
         # have 'staff debuggable' categories configurable in settings or have an XBlock declare itself staff debuggable
         if SCORM_DISPLAY_STAFF_DEBUG_INFO and not authoring:  # don't show for author preview
             from courseware.access import has_access
@@ -397,7 +400,7 @@ class ScormXBlock(XBlock):
 
     def _init_scos(self):
         """
-        initialize all SCOs with proper credit and status values in case 
+        initialize all SCOs with proper credit and status values in case
         content package does not do this correctly
         """
 
@@ -410,7 +413,7 @@ class ScormXBlock(XBlock):
 
     @XBlock.handler
     def get_raw_scorm_status(self, request, suffix=''):
-        """ 
+        """
         retrieve JSON SCORM API status as stored by SSLA player (or potentially others)
         """
         # TODO: handle errors
@@ -479,7 +482,7 @@ class ScormXBlock(XBlock):
         """
 
         # We must do this regardless of the lesson
-        # status to avoid race condition issues where a grade of None might overwrite a 
+        # status to avoid race condition issues where a grade of None might overwrite a
         # grade value for incomplete lesson statuses.
 
         # translate the internal score as a percentage of block's weight
