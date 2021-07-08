@@ -371,8 +371,28 @@ class ScormXBlock(XBlock):
             self._publish_grade()
             context.update({"lesson_score": self.lesson_score})
         if name == 'cmi.core.score.raw':
-            self._set_lesson_score(data.get('value',0))
+            self._set_lesson_score(data.get('value', 0))
         return context
+
+    def set_score(self, score):
+        """
+        Utility method used to rescore a problem.
+        """
+        self.lesson_score = score.raw_earned * self.weight
+
+    def max_score(self):
+        """
+        Return the maximum score possible.
+        """
+        return self.weight if self.has_score else None
+
+    def publish_grade(self):
+        lesson_score = 0 if not self.lesson_score else self.lesson_score
+        self.runtime.publish(
+            self,
+            "grade",
+            {"value": lesson_score, "max_value": self.weight},
+        )
 
     def _get_all_scos(self):
         return json.loads(self.raw_scorm_status).get('scos', None)
