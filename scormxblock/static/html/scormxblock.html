@@ -1,9 +1,16 @@
 <%!
 import cgi
+from openedx.core.djangolib.markup import HTML
 %>
 <%  
 	player_config_attrs = ''
 %>	
+
+<%block name="head_extra">
+    <script language="javascript">
+
+    </script>
+</%block>
 
 <% 
 for item in list({player_config}.items()):
@@ -13,6 +20,11 @@ for item in list({player_config}.items()):
 <div class="scormxblock_block">
     <h3 class="scorm_name">{self.display_name} (External Resource) <span class="scorm_weight">{self.weight} points possible</span></h3>
     <div class="scorm_description">{self.description}
+        % if self.display_type == 'iframe':
+             <p class="warning">
+                <span class="icon fa fa-warning">Please complete work in the module popup window or tab before navigating away from this page to avoid losing work.</span>
+            </p>
+        % endif
         <div class="scorm_launch"><button id="scorm-launch-{self.url_name}">Launch module</button></div>
     </div>
 
