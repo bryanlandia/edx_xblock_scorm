@@ -22,7 +22,7 @@ for item in list({player_config}.items()):
     <div class="scorm_description">{self.description}
         % if self.display_type == 'iframe':
              <p class="warning">
-                <span class="icon fa fa-warning">Please complete work in the module popup window or tab before navigating away from this page to avoid losing work.</span>
+                <span class="icon fa fa-warning">ATTENTION: Please complete your course work in the module popup window/tab before navigating away from this page to avoid losing your course progress.</span>
             </p>
         % endif
         <div class="scorm_launch"><button id="scorm-launch-{self.url_name}">Launch module</button></div>
