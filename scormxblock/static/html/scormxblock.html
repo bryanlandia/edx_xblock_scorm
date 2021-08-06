@@ -20,10 +20,10 @@ for item in list({player_config}.items()):
 <div class="scormxblock_block">
     <h3 class="scorm_name">{self.display_name} (External Resource) <span class="scorm_weight">{self.weight} points possible</span></h3>
     <div class="scorm_description">{self.description}
-         <p class="warning">
-            <span class="icon fa fa-warning">ATTENTION: Please complete your course work in the module popup window/tab before navigating away from this page to avoid losing your course progress.</span>
-        </p>
-
+         <div class="alert alert-warning" role="alert">
+            <span class="icon icon-alert fa fa fa-warning" aria-hidden="true"></span>
+            <div class="message-content">ATTENTION: Please complete your course work in the module popup window/tab before navigating away from this page to avoid losing your course progress.</div>
+        </div>
         <div class="scorm_launch"><button id="scorm-launch-{self.url_name}">Launch module</button></div>
     </div>
 
