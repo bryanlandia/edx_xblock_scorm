@@ -87,6 +87,7 @@ function ScormXBlock_${block_id}(runtime, element) {
           event.preventDefault();
           // the below is mostly unsupported by browsers so we will probably get the default confirmation dialog
           return event.returnValue = "Leaving this page while the module popup is open can result in losing current or further progress in the module.";
+        }
       }
       catch (e) {
         if (e instanceof TypeError) {
