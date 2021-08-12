@@ -83,7 +83,7 @@ function ScormXBlock_${block_id}(runtime, element) {
       // since to assign this directly to playerWin w/o being able to use addEventListener,
       // means we can't capture, we don't know if player may actually try to close its popup window while this is firing
       try {
-        if (event.currentTarget.frames[0].frames.length > 0) {  // host iframe has opened popups
+        if (event.currentTarget.frames.length > 0) {  // host iframe has opened popups
           event.preventDefault();
           // the below is mostly unsupported by browsers so we will probably get the default confirmation dialog
           return event.returnValue = "Leaving this page while the module popup is open can result in losing current or further progress in the module.";
@@ -95,6 +95,13 @@ function ScormXBlock_${block_id}(runtime, element) {
         }
       }
     };
+
+    const winBeforeUnloadListener = (event) => {
+        event.preventDefault();
+        return False;
+    }
+
+    window.onbeforeunload = winBeforeUnloadListener;
 
     //post message with data to player frame
     //player must be in an iframe and not a popup due to limitations in Internet Explorer's postMessage implementation
@@ -111,14 +118,17 @@ function ScormXBlock_${block_id}(runtime, element) {
       host_frame_${block_id}.attr('src',host_frame_${block_id}.data('player_url'));
       $(host_frame_${block_id}).on('load', function() {
         playerWin = host_frame_${block_id}[0].contentWindow;
+        hostWin = window;
         playerWin.postMessage(host_frame_${block_id}.data(), '*');
         launch_btn_${block_id}.attr('disabled','true');
 
         playerWin.onbeforeunload = beforeUnloadListener; // addEventListener doesn't work here, cross-browser
-        playerWin.ssla.ssla.scorm.events.postFinish.add(function() {
-            launch_btn_${block_id}.removeAttr('disabled');
-              playerWin.onbeforeunload = null;
-        })
+        if (playerWin.hasOwnProperty('ssla')) {
+            playerWin.ssla.ssla.scorm.events.postFinish.add(function() {
+                hostWin.onbeforeunload = null;
+                launch_btn_${block_id}.removeAttr('disabled');
+            });
+        }
       });
     });
   });
