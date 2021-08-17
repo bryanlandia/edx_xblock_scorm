@@ -79,30 +79,57 @@ function ScormXBlock_${block_id}(runtime, element) {
     API = new SCORM_API();
     console.log("Initial SCORM data...");
 
+    const beforeUnloadListener = (event) => {
+      // since to assign this directly to playerWin w/o being able to use addEventListener,
+      // means we can't capture, we don't know if player may actually try to close its popup window while this is firing
+      try {
+        if (event.currentTarget.frames.length > 0) {  // host iframe has opened popups
+          event.preventDefault();
+          // the below is mostly unsupported by browsers so we will probably get the default confirmation dialog
+          return event.returnValue = "Leaving this page while the module popup is open can result in losing current or further progress in the module.";
+        }
+      }
+      catch (e) {
+        if (e instanceof TypeError) {
+          return;
+        }
+      }
+    };
+
+    const winBeforeUnloadListener = (event) => {
+        event.preventDefault();
+        return False;
+    }
+
+    window.onbeforeunload = winBeforeUnloadListener;
+
     //post message with data to player frame
     //player must be in an iframe and not a popup due to limitations in Internet Explorer's postMessage implementation
     launch_btn_${block_id} = $('#scorm-launch-${block_id}');
     host_frame_${block_id} = $('#scormxblock-${block_id}');
     host_frame_${block_id}.data('csrftoken', $.cookie('csrftoken'));
+    display_type = host_frame_${block_id}.data('display_type');
+
     launch_btn_${block_id}.on('click', function() {
       playerWin = null;
-      if (host_frame_${block_id}.data('display_type') == 'iframe') {
+      if (display_type == 'iframe') {
         host_frame_${block_id}.css('height', host_frame_${block_id}.data('display_height') + 'px');
       }
       host_frame_${block_id}.attr('src',host_frame_${block_id}.data('player_url'));
       $(host_frame_${block_id}).on('load', function() {
         playerWin = host_frame_${block_id}[0].contentWindow;
+        hostWin = window;
         playerWin.postMessage(host_frame_${block_id}.data(), '*');
         launch_btn_${block_id}.attr('disabled','true');
 
-        playerWin.ssla.ssla.scorm.events.postFinish.add(function() {
-        launch_btn_${block_id}.removeAttr('disabled');
-        })
-
+        playerWin.onbeforeunload = beforeUnloadListener; // addEventListener doesn't work here, cross-browser
+        if (playerWin.hasOwnProperty('ssla')) {
+            playerWin.ssla.ssla.scorm.events.postFinish.add(function() {
+                hostWin.onbeforeunload = null;
+                launch_btn_${block_id}.removeAttr('disabled');
+            });
+        }
       });
-      
-
-    });    
-
+    });
   });
 }
