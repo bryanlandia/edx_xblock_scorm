@@ -115,7 +115,6 @@ function ScormXBlock_${block_id}(runtime, element) {
       if (display_type == 'iframe') {
         host_frame_${block_id}.css('height', host_frame_${block_id}.data('display_height') + 'px');
       }
-      host_frame_${block_id}.attr('src',host_frame_${block_id}.data('player_url'));
       $(host_frame_${block_id}).on('load', function() {
         playerWin = host_frame_${block_id}[0].contentWindow;
         hostWin = window;
@@ -130,6 +129,11 @@ function ScormXBlock_${block_id}(runtime, element) {
             });
         }
       });
+      host_frame_${block_id}.attr('src',host_frame_${block_id}.data('player_url'));
     });
+      
+
+    });    
+
   });
 }
