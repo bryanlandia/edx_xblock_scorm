@@ -98,7 +98,7 @@ function ScormXBlock_${block_id}(runtime, element) {
 
     const winBeforeUnloadListener = (event) => {
         event.preventDefault();
-        return False;
+        return false;
     }
 
     window.onbeforeunload = winBeforeUnloadListener;
