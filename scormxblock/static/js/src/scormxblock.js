@@ -131,9 +131,5 @@ function ScormXBlock_${block_id}(runtime, element) {
       });
       host_frame_${block_id}.attr('src',host_frame_${block_id}.data('player_url'));
     });
-      
-
-    });    
-
   });
 }
